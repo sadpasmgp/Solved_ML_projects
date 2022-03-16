@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+</head>
+<body>
+<form method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default"><h2>Name of the Pokemon</h2></span>
+        <input name="Pokemon Name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <br><hr>
+    <h3>Total sum of all power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="total" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>HP Power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="HP" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Attack power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="attack" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Defence power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="defence" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Special Attack power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="special" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Special Defence power: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="speciald" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Speed: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="speed" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Currect Generation of Pokemon: </h3>
+    <select name="gen" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="6">6</option>
+        <option value="5">5</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+        <option value="1">1</option>
+    </select>
+    <br><hr>
+    <h3>Pokemon has gender : </h3>
+    <select name="hasgen" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="True">True</option>
+        <option value="False">False</option>
+    </select>
+    <br><hr>
+    <h3>Pr_Male: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in HP</span>
+        <input name="Pr_Male" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Does the pokemon have MegaEvolution: </h3>
+    <select name="hasMegaEvolution" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="True">True</option>
+        <option value="False">False</option>
+    </select>
+    <br><hr>
+    <h3>Height of Pokemon: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in kg</span>
+        <input name="height" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Weight of Pokemon: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">in kg</span>
+        <input name="weight" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Catch Rate of Pokemon: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">numbers</span>
+        <input name="catch" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <!--
+     bipedal_tailed      158
+    quadruped           135
+    bipedal_tailless    109
+    two_wings            63
+    head_arms            39
+    head_only            34
+    with_fins            31
+    insectoid            30
+    head_base            30
+    serpentine_body      29
+    four_wings           18
+    head_legs            17
+    multiple_bodies      15
+    several_limbs        13
+     -->
+    <h3>Body Style of Pokemon: </h3>
+    <select name="bodystyle" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="158">bipedal_tailed</option>
+        <option value="135">quadruped</option>
+        <option value="109">bipedal_tailless</option>
+        <option value="63">two_wings</option>
+        <option value="39">head_arms</option>
+        <option value="34">head_only</option>
+        <option value="31">with_fins</option>
+        <option value="30">insectoid</option>
+        <option value="30">head_base</option>
+        <option value="29">serpentine_body</option>
+        <option value="18">four_wings</option>
+        <option value="17">head_legs</option>
+        <option value="15">multiple_bodies</option>
+        <option value="13">several_limbs</option>
+    </select>
+    <br><hr>
+    <!-- Dark	Dragon	Electric	Fighting	Fire	Flying	Grass	Normal	Poison	Rock	Water	 -->
+    <h3>Pokemon Type: </h3>
+    <select name="type" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Dark">Dark</option>
+        <option value="Dragon">Dragon</option>
+        <option value="Electric">Electric</option>
+        <option value="Fighting">Fighting</option>
+        <option value="Fire">Fire</option>
+        <option value="Flying">Flying</option>
+        <option value="Grass">Grass</option>
+        <option value="Normal">Normal</option>
+        <option value="Poison">Poison</option>
+        <option value="Rock">Rock</option>
+        <option value="Water">Water</option>
+    </select>
+    <br><hr>
+    <!-- Black	Blue	Brown	Green	Grey	Pink	Purple	Red	White	Yellow -->
+    <h3>Pokemon Color: </h3>
+    <select name="color" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Black">Black</option>
+        <option value="Blue">Blue</option>
+        <option value="Brown">Brown</option>
+        <option value="Green">Green</option>
+        <option value="Grey">Grey</option>
+        <option value="Pink">Pink</option>
+        <option value="Purple">Purple</option>
+        <option value="Red">Red</option>
+        <option value="White">White</option>
+        <option value="Yellow">Yellow</option>
+     </select>
+    <br>
+    <br>
+    <div class="col-auto">
+        <button type="submit" name="pred_button" value="Save&Next">Confirm Submission</button>
+    </div>
+</form>
+</body>
