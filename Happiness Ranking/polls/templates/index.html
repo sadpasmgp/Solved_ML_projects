@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default"><h2>Country</h2></span>
+        <input name="Country Name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default1"><h2>Region</h2></span>
+        <input name="Region" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Happiness Score (max 8, min 0)</span><br>
+        <input name="hapScore" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Standard Error (range (0.002 - 0.2))</span><br>
+        <input name="se" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Economy (GDP per Capita)	 (range (0.0 - 1.8))</span><br>
+        <input name="eco" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Family Size Average (range (1.0 - 2.25))</span><br>
+        <input name="fam" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Health (Life Expectancy) (range (0.0 - 1.25))</span><br>
+        <input name="life" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Freedom Score (range (0.0 - 0.7))</span><br>
+        <input name="free" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Trust (Government Corruption) (range (0.0 - 0.56))</span><br>
+        <input name="gov" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Generosity Scale (range (0.0 - 1.0))</span><br>
+        <input name="Gen" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Dystopia Residual (range (0.3 - 3.6))</span><br>
+        <input name="dys" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br>
+    <div class="col-auto">
+        <button type="submit" name="pred_button" value="Save&Next">Confirm Submission</button>
+    </div>
+
+{% if result %}
+    <h3>The Happiness Rank for the Country is : {{ result }}</h3>
+{% endif %}
+</form>
+</body>
+</html>
