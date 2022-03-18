@@ -1,6 +1,9 @@
-# End2End_ML_projects
+# End2End_ML_projects 
 
-- End to End solved datascience projects
+Some of the projects are completed:
 - With modin or pyspark enhancements
 - With Deployment files and APIs
-- AutoML implementation
+- with AutoML implementation
+- with Explainability with Shap, Lime etc
+
+Feel free to leave a comment or star the repo
