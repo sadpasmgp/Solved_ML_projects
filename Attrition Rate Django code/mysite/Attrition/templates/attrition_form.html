@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attrition Form fillup</title>
+</head>
+<body>
+<form method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="inputGroup-sizing-default"><h2>Name</h2></span>
+        <input name="Person Name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <br><hr>
+    <h3>Currectly living at: </h3>
+    <select name="location" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="7">Chennai</option>
+        <option value="6">Noida</option>
+        <option value="5">Bangalore</option>
+        <option value="4">Hydrabad</option>
+        <option value="3">Pune</option>
+        <option value="2">Madurai</option>
+        <option value="1">Other Place</option>
+    </select>
+    <br><hr>
+    <h3>Current Employee Group : </h3>
+    <select name="emp-group" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="B1">B1</option>
+        <option value="B2">B2</option>
+        <option value="B3">B3</option>
+        <option value="other group">Other Group</option>
+    </select>
+    <br><hr>
+    <h3>Current Working Function: </h3>
+    <select name="function" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Support">Support</option>
+        <option value="Operation">Operation</option>
+        <option value="Sales">Sales</option>
+    </select>
+    <br><hr>
+    <h3>Gender: </h3>
+    <select name="gender" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="other">Other</option>
+    </select>
+    <br><hr>
+    <h3>Select your Tenure Group: </h3>
+    <select name="tenure group" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="< =1">< =1 (in years)</option>
+        <option value="> 1 & < =3">> 1 & < =3 (in years)</option>
+    </select>
+    <br><hr>
+    <h3>Experience in Industry: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Years</span>
+        <input name="experience" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Your Age: </h3>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Years</span>
+        <input name="age" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <h3>Marital Status: </h3>
+    <select name="Marital" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Marr.">Marr.</option>
+        <option value="Single">Single</option>
+        <option value="Other status">Other status</option>
+    </select>
+    <br><hr>
+    <h3>Source of Hiring: </h3>
+    <select name="Hiring" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="Agency">Agency</option>
+        <option value="Direct">Direct</option>
+        <option value="Employee Referral">Employee Referral</option>
+    </select>
+    <br><hr>
+    <h3>Have been promoted before: </h3>
+    <select name="Promoted" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">Promoted</option>
+        <option value="0">Not Promoted</option>
+    </select>
+    <br><hr>
+    <h3>Does the Job Role matches according to employee: </h3>
+    <select name="Job" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">Job Role matches</option>
+        <option value="0">Job Role does not match</option>
+    </select>
+    <br><hr>
+    <div class="col-auto">
+        <button type="submit" name="attrition_button" value="Save&Next">Confirm Submission</button>
+    </div>
+</form>
+
+{% if result %}
+<h2>The Attrition value is: {{ result }}!</h2>
+{% endif %}
+
+</body>
+</html>
