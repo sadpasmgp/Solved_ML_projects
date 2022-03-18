@@ -1,0 +1,15 @@
+----------------Commands to run on Linux Server-------------
+
+
+
+
+2.1 sudo apt install python3
+
+2.2 sudo apt-get update && sudo apt-get install python3 pip
+
+(in case the ↑ command doesn't work,try this ↓)
+
+2.2 sudo apt install python3 pip
+
+
+2.3pip install -r requirements.txt

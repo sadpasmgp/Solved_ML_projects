@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Genre Prediction</title>
+</head>
+
+<body>
+
+    <div class="container my-4">
+
+         <h2 class="my-4 text-center">Book Genre Prediction</h2>
+
+    
+
+        <div class="alert alert-success my-4" role="alert">
+
+            <div class="container">
+                <div class="content">
+
+                    <h1>CMU Book Summary Dataset</h1>
+
+                    <p>
+                        The CMU Book Summary Dataset supports ongoing work described in:
+                    </p>
+                    <p>
+
+                    </p>
+                    <p>
+                        David Bamman and Noah Smith (2013), "New Alignment Methods for Discriminative Book Summarization," [<a href="http://arxiv.org/abs/1305.1319">ArXiv</a>]
+                    </p>
+
+                    <a href="data/booksummaries.tar.gz">booksummaries.tar.gz</a> [17M]
+                    <p>
+
+                    </p>
+                    <hr>
+
+                    <p>
+                        This dataset contains plot summaries for 16,559 books extracted from Wikipedia, along with aligned metadata from Freebase, including book author, title, and genre. </p>
+
+                    <p>
+                        All data is released under a <a href="http://creativecommons.org/licenses/by-sa/3.0/us/legalcode">Creative Commons
+                                Attribution-ShareAlike License</a>. For questions or comments, please contact David Bamman (dbamman@cs.cmu.edu).</p>
+
+                    <h3> Example </h3>
+
+                    The following example illustrates the data and metadata available for Don DeLillo's <em>White
+                            Noise</em>.
+                    <p>
+
+                    </p>
+                    <h4>Book metadata</h4>
+                    <table border="1" width="90%">
+                        <tbody>
+                            <tr>
+                                <td>Wikipedia ID</td>
+                                <td>1166383</td>
+                            </tr>
+                            <tr>
+                                <td>Freebase ID</td>
+                                <td>/m/04cvx9</td>
+                            </tr>
+                            <tr>
+                                <td>Book title</td>
+                                <td>White Noise</td>
+                            </tr>
+                            <tr>
+                                <td>Book author</td>
+                                <td>Don DeLillo</td>
+                            </tr>
+                            <tr>
+                                <td>Publication date</td>
+                                <td>1985-01-21</td>
+                            </tr>
+                            <tr>
+                                <td>Genres</td>
+                                <td>Novel, Postmodernism, Speculative fiction, Fiction</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Plot summary</h4>
+                    Set at a bucolic Midwestern college known only as The-College-on-the-Hill, White Noise follows a year in the life of Jack Gladney, a professor who has made his name by pioneering the field of Hitler Studies (though he hasn't taken German language lessons
+                    until this year). He has been married five times to four women and has a brood of children and stepchildren (Heinrich, Denise, Steffie, Wilder) with his current wife, Babette. Jack and Babette are both extremely afraid of death; they
+                    frequently wonder which of them will be the first to die. The first part of White Noise, called "Waves and Radiation," is a chronicle of contemporary family life combined with academic satire. There is little plot development in this
+                    section, which mainly serves as an introduction to the characters and themes that will dominate the rest of the book. For instance, the mysterious deaths of men in Mylex suits and the ashen, shaken survivors of a plane that went into
+                    free fall anticipate the catastrophe of the book's second part. Outside of the family, another important character introduced here is Murray, another college professor, who frequently discusses his theories, which relate to the rest
+                    of the book. In the second part, "The Airborne Toxic Event," a chemical spill from a rail car releases a black noxious cloud over Jack's home region, prompting an evacuation. Frightened by his exposure to the toxin, Gladney is forced
+                    to confront his mortality. An organization called SIMUVAC (short for "simulated evacuation") is also introduced in Part Two, an indication of simulations replacing reality. In part three of the book, "Dylarama," Gladney discovers that
+                    Babette has been cheating on him in order to gain access to a fictional drug called Dylar, an experimental treatment for the fear of death. The novel becomes a meditation on modern society's fear of death and its obsession with chemical
+                    cures as Gladney seeks to obtain his own black market supply of Dylar. However, Dylar does not work for Babette, and it has many possible side effects, including losing the ability to "distinguish words from things, so that if someone
+                    said 'speeding bullet,' I would fall to the floor to take cover." Jack continues to obsess over death. During a discussion about mortality, Murray hypothesizes that killing someone could perhaps alleviate the fear. Jack decides to
+                    test Murray's theory by tracking down and killing the man who had given Dylar to Babette in exchange for sex. After a black comedy scene of Jack driving and rehearsing, in his head, several ways in which their encounter might proceed,
+                    he successfully locates and shoots Willie Mink, who is delirious from his own Dylar addiction. He then puts the gun in Willie's hand to make the murder look like a suicide, but Willie then shoots Jack in the arm. Suddenly realizing
+                    the needless loss of life, Jack carries Willie to a hospital run by German nuns who do not believe in God or an afterlife. Having saved Willie, Jack returns home to watch his children sleep. The final chapter describes Wilder, Jack's
+                    youngest child, riding a tricycle across the highway and miraculously surviving.
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Form -->
+
+        <div></div>
+
+        <h2 class="my-4 text-center">Book Genre Prediction</h2>
+
+        <form class="my-4" action="/" method="POST">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Enter the Summary of the Book</label>
+                <textarea class="form-control" id="summary" name="summary" rows="3"></textarea>
+            </div>
+
+            <!-- button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </div>
+
+        </form>
+
+        {%if showresult%}
+            
+            <div class = "container my-4">
+              
+               <div class="alert alert-success" role="alert">
+
+                    <p>Your Summary : {{text}}...</p>
+                
+                    <p>Predicted Genre for the summary is : <span style = "color:red;font-size:1 rem;">{{genre}}</p>
+                    <hr>
+
+                </div>
+            </div>
+        {%endif%}
+
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>
