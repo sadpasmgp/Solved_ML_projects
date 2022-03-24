@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shoppers Online</title>
+</head>
+<body>
+<form method="post" action="{% url 'homepage' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="input-group mb-3"> <!-- text taking -->
+        <span class="input-group-text" id="inputGroup-sizing-default"><h2>Name of the Product</h2></span>
+        <input name="Product Name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Administrative Duration: </span>
+        <input name="Administrative" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Informational Duration: </span>
+        <input name="Informational" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Was the Product Related (if it was then on the scale of 0-300): </span>
+        <input name="ProductRelated" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Did the customer go from this product to any related product afterwards (0-0.2): </span>
+        <input name="BounceRates" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Customer exited the website after the said product (0-0.2): </span>
+        <input name="ExitRates" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Page Value (0-100): </span>
+        <input name="PageValues" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+    <div class="input-group mb-3"> <!-- number taking -->
+        <span class="input-group-text">Is it a Special Day like New Year's day (0-1.0): </span>
+        <input name="SpecialDay" type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+    </div>
+    <br><hr>
+
+    <h3>Which Operating System was used: </h3>
+    <select name="OperatingSystems" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">Windows 10</option>
+        <option value="2">Linux</option>
+        <option value="3">Mac OS</option>
+        <option value="4">Windows 8</option>
+        <option value="5">Windows 7</option>
+        <option value="6">Ubuntu Specifically</option>
+        <option value="7">BSD</option>
+        <option value="8">Windows XP</option>
+    </select>
+    <br><hr>
+
+    <h3>Which Browser was used: </h3>
+    <select name="Browser" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">Google Chrome</option>
+        <option value="2">Microsoft Edge</option>
+        <option value="3">Safari</option>
+        <option value="4">Opera</option>
+        <option value="5">Brave</option>
+        <option value="6">Vivaldi</option>
+        <option value="7">Internet Explorer 10</option>
+        <option value="8">UC Browser</option>
+        <option value="9">Opera mini</option>
+        <option value="10">Tor Browser</option>
+        <option value="11">Chromium</option>
+        <option value="12">Internet Explorer 9</option>
+        <option value="13">Other</option>
+    </select>
+    <br><hr>
+
+    <h3>Which Region: </h3>
+    <select name="Region" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+    </select>
+    <br><hr>
+
+    <h3>How much traffic was observed (1-6): </h3>
+    <select name="TrafficType" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+    </select>
+    <br><hr>
+
+    <h3>How much traffic was observed (1-6): </h3>
+    <select name="VisitorType" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">New Visitor</option>
+        <option value="2">Returning visitor</option>
+        <option value="3">Other visitor</option>
+    </select>
+    <br><hr>
+    <h3>Is it a weekend: </h3>
+    <select name="weekend" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <option selected>Open this select menu</option>
+        <option value="1">True</option>
+        <option value="0">False</option>
+    </select>
+    <br><hr>
+    <div class="col-auto">
+        <button type="submit" name="pred_button" value="Save&Next">Confirm Submission</button>
+    </div>
+</form>
+{% if result %}
+<h2>The customer will generate Revenue: {{ result }}</h2>
+{% endif %}
+</body>
+</html>
