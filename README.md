@@ -1,9 +1,13 @@
 # End2End_ML_projects 
 
-Some of the projects are completed:
-- With modin or pyspark enhancements
-- With Deployment files and APIs
-- with AutoML implementation
+This repo is in progress:
+
+Projects that start with:
+- 'modin' have modin pandas implementation with ray or dask as back engine
+- 'pyspark' have pyspark code
+
+I will try to implement AutoML with EvalML or TPOT for future projects
+
 - with Explainability with Shap, Lime etc
 - with mlflow, kubeflow implementation
 
