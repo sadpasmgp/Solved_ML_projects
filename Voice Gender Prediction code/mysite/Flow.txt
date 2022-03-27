@@ -1,0 +1,12 @@
+1. Set up a directory where you will be keeping the code.
+2. open your terminal or project IDE, like I have as Pycharm.
+3. If you have pycharm then follow the steps to make anew environment for the project.
+4. If not, then use a command to instantiate a new environment.
+5. Then run the command pip install requirements.txt
+6. Then follow the command to set up django application.
+7. inside mysite directory in terminal: python manage.py migrate
+8. inside mysite directory in terminal: python manage.py runserver
+
+-> Creating a Django project: django-admin startproject <project_name>
+-> Creating an app inside a django project: python manage.py startapp <app_name>
+
