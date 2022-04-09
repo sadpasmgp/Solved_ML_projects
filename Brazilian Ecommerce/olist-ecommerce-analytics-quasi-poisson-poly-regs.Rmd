@@ -1,0 +1,1034 @@
+---
+title: "Olist a Brazilian e-commerce"
+author: "Anshuman Moudgil"
+date: "24 April 2019"
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    fig_width: 7
+    fig_height: 4.5
+    theme: readable
+    highlight: tango
+    code_folding: hide
+---
+
+<hr>
+
+**SUBJECT: eCommerce & Supply Chain**
+
+- $1^{st} \text{ case is about a}$ [**Spanish** eCommerce Ulabox](https://www.kaggle.com/anshumoudgil/ulabox-ecommerce-hypothesis-strategy-clustering)
+- $2^{nd} \text{ case is about a}$ [**Brazilian** eCommerce Olist](https://www.kaggle.com/anshumoudgil/olist-ecommerce-analytics-clusters-poly-equation)
+
+<hr>
+
+Versions: 24 Apr 2019, 29 Apr 2019, 03 May 2019, 15 May 2019, 06 Feb 2020.
+
+<hr>
+
+Dear Reader,
+
+# Olist's Business Model
+
+**[Olist](http://www.olist.com/)** is a **Brazilian** departmental store (*marketplace*) that **operates in e-commerce segment, but is not an e-commerce itself** (*as she says*). It operates as a SaaS (*Software as a Service*) technology company since 2015. It offers a marketplace solution (*of e-commerce segment*) to shopkeepers of all sizes (*and for most segments*) to increase their sales whether they have online presence or not. 
+
+## Olist's Solution
+
+Olist's solution consists of three aspects: Software, Contracts with the main marketplaces and Reputation sharing. The diagram below shows how Olist links marketplaces, consumers (*Portuguese: consumidores*), and retailers (*Portuguese: varejistas*)
+
+![Olist’s marketplace model](https://olist.com/wp-content/uploads/2018/04/Group-40.svg)
+
+## What Olist says?
+
+Olist says she... 
+
+1. ... is a large department store within marketplaces.
+2. ... is connected to the main e-commerces of Brazil.
+3. ... does not buy products. 
+4. ... does not keep products in stock.
+5. ... does not carry out shipping of any products offered in its store. 
+6. All products are sold and shipped by the thousands of shopkeepers (**registered on Olist***) who sell through Olist.
+7. Her strength lies in union of all participating shopkeepers, who are selling physical products. 
+8. Participant shopkeeper is responsible for separating, packing, and taking products to the logistics operator.
+
+**Please note Olist's perspective (a supply chain preview):** she prescribes there are many factors that can influence the sales of a shopkeeper e.g. type of product, demand, seasonality, competitive pricing, terms, inventory etc
+
+In image below Olist describes (*in Portuguese*) how it differentiates itself from the other marketplaces based on reputation, product placements, dedicated teams to sales & customer service, reduced time to start selling, centralised control of operations and other competitive tools.
+
+![Olist’s niche — way to differentiate](https://olist.com/wp-content/uploads/2019/02/ilustracao-home.gif)
+
+# Data Model
+
+On Kaggle, she shared its data of 100k orders from 2016 to 2018. There are 8+1 datasets to play with and explore. The data model has been described in image below and it is organised and normalised for each category.
+
+![Data Model](https://i.imgur.com/HRhd2Y0.png) 
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(knitr)
+library(gridExtra)
+library(lattice)
+library(caret)
+library(kableExtra)
+
+Customers <- read.csv("../input/olist_customers_dataset.csv", header = TRUE)
+Geolocation <- read.csv("../input/olist_geolocation_dataset.csv", header = TRUE)
+Items <- read.csv("../input/olist_order_items_dataset.csv", header = TRUE)
+Payments <- read.csv("../input/olist_order_payments_dataset.csv", header = TRUE)
+Reviews <- read.csv("../input/olist_order_reviews_dataset.csv", header = TRUE)
+Orders <- read.csv("../input/olist_orders_dataset.csv", header = TRUE)
+Products <- read.csv("../input/olist_products_dataset.csv", header = TRUE)
+Sellers <- read.csv("../input/olist_sellers_dataset.csv", header = TRUE)
+Pdttrans <- read.csv("../input/product_category_name_translation.csv", header = TRUE)
+
+```
+
+## Principal Dataset
+
+Orders dataset
+
+- Order ID
+- Customer ID
+- Order Status 
+- Order Purchase Timestamp
+- Order Approved at
+- Order Delivered Carrier date
+- Order Delivered Customer date
+- Order Estimated delivered date
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Orders), format = "markdown",caption = "Orders dataset")
+```
+
+## Other Datasets {.tabset .tabset-fade .tabset-pills}
+
+### Customers dataset
+
+- Customer ID
+- Customer Unique ID
+- Customer Zip Code prefix
+- Customer City
+- Customer State
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Customers), format = "markdown", caption = "Customers dataset")
+```
+
+### Geolocation dataset
+
+- Geolocation Zip Code prefix
+- Geolocation Lat.
+- Geolocation Lng.
+- Geolocation City
+- Geolocation State
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Geolocation), format = "markdown", caption = "Geolocation dataset")
+```
+
+### Items dataset
+
+- Order ID
+- Order Item ID
+- Seller ID
+- Shipping limit date
+- Price
+- Freight Value
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Items), format = "markdown", caption = "Items dataset")
+```
+
+### Payments dataset
+
+- Order ID
+- Payment Sequential 
+- Payment Type
+- Payment Installments
+- Payment Value
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Payments), format = "markdown", caption = "Payments dataset")
+```
+
+### Products dataset
+
+- Product ID
+- Product Category name
+- Product Name length
+- Product Photos (quantity)
+- Product Weight (grams)
+- Product Length (cm)
+- Product Height (cm)
+- Product Width (cm)
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Products), format = "markdown", caption = "Products dataset")
+```
+
+### Reviews dataset
+
+- Review ID
+- Order ID
+- Review Score
+- Review Comment title
+- Review Comment message
+- Review Creation date
+- Review Answer timestamp
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Reviews), format = "markdown", caption = "Reviews dataset")
+```
+
+### Sellers dataset
+
+- Seller ID
+- Seller Zip Code prefix
+- Selller City
+- Seller State
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Sellers), format = "markdown", caption = "Sellers dataset")
+```
+
+### Product Category translation dataset
+
+- Product Category name (Portuguese)
+- Product Category name (English)
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+kable(head(Pdttrans), format = "markdown", caption = "Translation dataset")
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+Orders <- mutate(Orders, Est.Lead.t = interval(ymd_hms(Orders$order_purchase_timestamp), ymd_hms(Orders$order_estimated_delivery_date)) %/% days(x = 1))
+Orders <- mutate(Orders, Act.Lead.t = interval(ymd_hms(Orders$order_purchase_timestamp), ymd_hms(Orders$order_delivered_customer_date)) %/% days(x = 1))
+Orders <- mutate(Orders, Approval.mins = interval(ymd_hms(Orders$order_purchase_timestamp), ymd_hms(Orders$order_approved_at)) %/% minutes(x = 1))
+Orders <- mutate(Orders, Appr.to.Car = interval(ymd_hms(Orders$order_purchase_timestamp), ymd_hms(Orders$order_delivered_carrier_date)) %/% days(x = 1))
+Orders <- mutate(Orders, Car.to.Cus = interval(ymd_hms(Orders$order_delivered_carrier_date), ymd_hms(Orders$order_delivered_customer_date)) %/% days(x = 1))
+Orders <- mutate(Orders, purchase_quart = quarter(Orders$order_purchase_timestamp, with_year = TRUE))
+Orders <- mutate(Orders, purchase_month = month(Orders$order_purchase_timestamp, label = TRUE, abbr = FALSE))
+Orders <- mutate(Orders, purchase_year = year(Orders$order_purchase_timestamp))
+
+Items <- mutate(Items, order.price = (order_item_id*price))
+Items <- mutate(Items, order.freight = (order_item_id*freight_value))
+Items <- mutate(Items, total.order.cost = (order.price + order.freight))
+Items <- mutate(Items, fr.sup.pr = if_else(freight_value >= price, 1, 0))
+```
+# Stimulation as *ƒ(Customers, Product Categories, Sellers)*
+
+Olist has been stimultaed by addition of Customers, Product Catgories, and Sellers. As per the data, there has been a steady stream of customers and sellers getting registered on Olist's platform. This progress, in conjunction with regular increase in number of new product categories being offered has maintained Olist's growth momentum.
+
+## Trend of New Customers' registration
+
+The graph shows, in 2017, there has been a positive trend line in number of New Customers [**Customer Unique Identity**] getting registered with Olist. In 2018, more than 6000 were getting registered every month.
+
+```{r, warning=FALSE, fig.align='center', message=FALSE, echo=FALSE}
+
+Cust.gr <- inner_join(Orders, Customers, by = "customer_id")
+
+Cust.gr %>% select_at(vars(purchase_year, purchase_month, customer_unique_id)) %>% distinct_at(vars(purchase_year, purchase_month, customer_unique_id)) %>% arrange_at(vars(purchase_year, purchase_month)) %>% count_(vars(purchase_year, purchase_month)) %>% ggplot(aes(y = n, x = as.factor(purchase_month), label = n, color = factor(purchase_year)))+
+  geom_point(size = 5, color = 'navy', shape = 21, alpha = 0.54)+
+  geom_point(size = 3.75, color = 'navy', shape = 21, alpha = 0.72)+
+  geom_label(aes(fill = factor(purchase_year)), colour = "white", fontface = "bold", vjust = 1, size = 4.25)+
+  facet_grid(.~purchase_year)+
+              theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = c(0.1,0.7))+
+  labs(title = "Trend of new customer registration per month", x = "Months", y = "Number of Customers", fill = "Purchase Year")
+
+```
+
+## Galvanisation by Product Categories
+
+In my opinion, addition of +50 (*approximate*) New Product Categories per month - *as an offer* - has galvanised the spurt in new customers getting registered. Consistency in this phenomenon was Olist's byword for 20 months i.e. from January 2017 to August 2018.
+
+```{r, warning=FALSE, message=FALSE, fig.align='center', echo=FALSE}
+Products <- left_join(Products, Pdttrans, by = "product_category_name")
+Items <- left_join(Items, Products, by = "product_id")
+Pdt.Gr <- inner_join(Orders, Items, by = "order_id")
+
+Pdt.Gr %>% select_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% distinct_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% arrange_at(vars(purchase_year, purchase_month)) %>% count_(vars(purchase_year, purchase_month)) %>% ggplot(aes(x = factor(purchase_month), y = n))+
+  geom_point(color = "darkorchid", alpha = 0.72, shape = 21, aes(size = n), fill = alpha("snow2", 0.3))+
+  geom_point(color = "darkorchid", alpha = 0.81, shape = 21, aes(size = n*0.6), fill = alpha("snow2", 0.3))+
+  geom_segment(aes(x = purchase_month, xend = purchase_month, y = 0, yend = n), alpha = 0.45, linetype = 3, color = "darkorchid")+
+  coord_polar(start = 2)+
+  facet_wrap(.~purchase_year)+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 8), panel.grid.major = element_line(), legend.position = "bottom")+
+  labs(title = "New Product categories introduced per month", x = "Months", y = "Number of Product Categories")
+
+```
+
+## Sellers' engagement
+
+Sellers too maintained the similar trend as that of Customers, and within the time frame of this data, Olist ended up having +3095 registered sellers on it's platform.
+
+```{r, warning=FALSE, message=FALSE, fig.align='center', echo=FALSE}
+
+Seller.Gr <- inner_join(Orders, left_join(Items, Sellers, by = "seller_id"), by = "order_id")
+
+Seller.Gr %>% select_at(vars(purchase_year, purchase_month, seller_id)) %>% distinct_at(vars(purchase_year, purchase_month, seller_id)) %>% arrange_at(vars(purchase_year, purchase_month)) %>% count_(vars(purchase_year, purchase_month)) %>% ggplot(aes(x = factor(purchase_month), y = n))+
+  geom_point(color = "red", alpha = 0.63, shape = 21, aes(size = n), fill = alpha("cornsilk", 0.3))+
+  geom_point(color = "red", alpha = 0.81, shape = 21, aes(size = n*0.6), fill = alpha("cornsilk", 0.3))+
+  geom_segment(aes(x = purchase_month, xend = purchase_month, y = 0, yend = n), alpha = 0.45, linetype = 3, color = "red")+
+  coord_polar(start = 2)+
+  facet_wrap(.~purchase_year)+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 8), panel.grid.major = element_line(), legend.position = "bottom")+
+  labs(title = "Increase in number of sellers per month", x = "Months", y = "Number of Sellers")
+
+```
+
+# FAST MOVING product categories
+
+Buoyancy of Product Categories can be gauged from the fact how frequently a Product Category has been purchased by customers? OR which are the customer driven “FAST MOVING” product categories? This kernel of information may act as one of the parameters which a company (*and in this case Olist*) may probably use for portfolio building. 
+
+This data model has information of 100k orders. Therefore, taking a cue from quartile distribution of data, I have further divided it into 6 sub — sections. This helped me visually determine (*in unscientific form*) which Product Categories were Fast Moving as per each sub — section. 
+
+## Purchase made multiple times 
+
+Lets first start with the case where all Product Categories were purchased multiple times. The graph below shows which categories are high frequency categories.
+
+**Please Note:** It excludes all the categories that were purchased as: one product category per month per year.
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9, fig.width=7.5}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english) & n >1) %>% ggplot(aes(x = product_category_name_english, y = n))+
+  geom_boxplot(color = "blueviolet", alpha = 0.63)+
+  coord_flip()+
+  facet_wrap(.~reorder(purchase_year, desc(purchase_year)), scales = "free_x")+
+  theme_minimal()+
+  scale_y_reverse()+
+  theme(axis.text.y = element_text(size = 7.25), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "grey95", linetype = 3))+
+  labs(title = "Categories purchased at high frequency per year", x = "Product Categories", y = "Number of times Product Category purchased")
+
+```
+
+## Six sub - sections {.tabset .tabset-fade .tabset-pills}
+
+### One Order per Product Category
+
+Case where only one order was placed for one product category in a month and in a given year.
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=8, fig.width=8}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english) & n ==1) %>% ggplot(aes(x = product_category_name_english, y = factor(n)))+
+  geom_rug(color = "white", alpha = 0.01)+
+  geom_text(aes(label = product_category_name_english), size = 3.25, color = "firebrick", vjust = 0)+
+  coord_flip()+
+  facet_wrap(.~purchase_year, scales = "free")+
+  theme(axis.text = element_blank(), axis.ticks = element_blank(), panel.background = element_blank(), panel.grid.major.x = element_line(color = "white"), panel.grid.major.y = element_line(color = "white"), strip.background = element_blank())+
+  labs(title = "ONE order for one Product Category/Month/Year",subtitle = "NO repetition cases",caption = "Note: Separate order for another category can be made in same month", x = "Product Category purchased", y = "... only ONE Order")
+
+```
+
+### Purchased **"1 < n < 6"** times
+
+Case where orders were placed for various product categories and each product category was purchased **more than once but less than six times**. Plus, list below provides some most frequently ordered categories.
+
+- Construction Tools
+- Cine Photo
+- DVDs Blue Ray
+- Fashion Female Clothing
+- Music
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9, fig.width=8}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english)) %>% filter(n > 1 & n < 6) %>% ggplot(aes(x = purchase_month, y = n))+
+  geom_boxplot(color = "orangered", alpha = 0.63)+
+  coord_flip()+
+  facet_wrap(.~factor(product_category_name_english), scales = "free_x")+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 5.5), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "cornsilk", linetype = 3))+
+  labs(title = "Section 02: Categories Purchased '1 < n < 6' times", x = "Months: January ... December", y = "n = number of times a Product Category was purchased")
+
+```
+
+### Purchased **"5 < n < 21"** times
+
+Case where orders were placed for various product categories and each product category was purchased **more than five but less than twenty one times**. Plus, list below provides some most frequently ordered categories.
+
+- Air Conditioning
+- Construction tools Garden
+- Fixed Telephony
+- Home Appliances 2
+- Market Place
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9, fig.width=8}
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english)) %>% filter(n > 5 & n < 21) %>% ggplot(aes(x = purchase_month, y = n))+
+  geom_boxplot(color = "navyblue", alpha = 0.45)+
+  coord_flip()+
+  facet_wrap(.~factor(product_category_name_english), scales = "free_x")+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 5.5), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "gray89", linetype = 3))+
+  labs(title = "Section 03: Categories Purchased '5 < n < 21' times", x = "Months: January ... December", y = "n = number of times a Product Category was purchased")
+
+```
+
+### Purchased **"20 < n < 93"** times
+
+Case where orders were placed for various product categories and each product category was purchased **more than twenty but less than ninety three times**. Plus, list below provides some most frequently ordered categories.
+
+- Books general interest
+- Console games
+- Home appliances
+- Luggage accessories
+- Musical instruments
+- Small appliances
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9, fig.width=8}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english)) %>% filter(n > 20 & n < 93) %>% ggplot(aes(x = purchase_month, y = n))+
+  geom_boxplot(color = "orangered", alpha = 0.63)+
+  coord_flip()+
+  facet_wrap(.~factor(product_category_name_english), scales = "free_x")+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 5.5), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "cornsilk", linetype = 3))+
+  labs(title = "Section 04: Categories Purchased '20 < n < 93' times", x = "Months: January ... December", y = "n = number of times a Product Category was purchased")
+
+```
+
+### Purchased **"92 < n < 251"** times
+
+Case where orders were placed for various product categories and each product category was purchased **more than ninety two but less than two hundred and fifty one times**. Plus, list below provides some most frequently ordered categories.
+
+- Baby
+- Cool stuff
+- Garden tools
+- Perfumery
+- Toys
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9, fig.width=8}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english)) %>% filter(n > 92 & n < 251) %>% ggplot(aes(x = purchase_month, y = n))+
+  geom_boxplot(color = "navyblue", alpha = 0.45)+
+  coord_flip()+
+  facet_wrap(.~factor(product_category_name_english), scales = "free_x")+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 5.5), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "gray89", linetype = 3))+
+  labs(title = "Section 05: Categories Purchased '92 < n < 251' times", x = "Months: January ... December", y = "n = number of times a Product Category was purchased")
+
+```
+
+### Purchased **"250 < n"** times
+
+Case where orders were placed for various product categories and each product category was purchased **more than two hundred and fifty times**. Plus, list below provides some most frequently ordered categories
+
+- Bed bath table
+- Computer accessories
+- Furniture decor
+- Health beauty
+- Housewares
+- Sports leisure
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.height=9}
+
+Pdt.Gr %>% group_by_at(vars(purchase_year, purchase_month, product_category_name_english)) %>% filter(!is.na(product_category_name_english))%>% count(product_category_name_english) %>% arrange(desc(n)) %>% filter(!is.na(product_category_name_english) & n >250) %>% ggplot(aes(x = purchase_month, y = n))+
+  geom_boxplot(color = "orangered", alpha = 0.63)+
+  coord_flip()+
+  facet_wrap(.~factor(product_category_name_english), scales = "free_x")+
+  theme_minimal()+
+  theme(axis.text = element_text(size = 8), panel.grid.major.x = element_line(color = "white"), panel.grid.minor.x = element_line(color = "white"), panel.grid.major.y =  element_line(color = "cornsilk", linetype = 3))+
+  labs(title = "Section 06: Categories Purchased 'n > 250' times", x = "Months: January ... December", y = "n = number of times a Product Category was purchased")
+
+```
+
+# Significant features, relations, & equations
+
+k-means clustering has been used to create clusters and to discover significant features. This helped me look into; how those features interacted and what were the relations betweent them? The clusters were created to look into data in tabular form and to discover the polynomial equations.
+
+## k - means Clustering {.tabset .tabset-fade .tabset-pills}
+
+There is no scientific method used to calcuate number of clusters. I plugged in 6 as number of centers, to keep things even numbered. 
+First, a big table has been created that contained all relevent features from all data sets (*at least from my analysis point of view*). I did various premutations and combinations to come up with most significant features that may maintain approximately same number of tuples in each cluster. This exercise gave me following features, whose values were first normalised and then they act as back bone of my clusters.
+
+- **Actual Lead Time (days):** Number of days taken to deliver a product to the customer, from the moment an order has been placed in the system.
+- **Order ID:** Identification of order.
+- **Approval time (mins):** Time taken by Olist's system to approve an order after an order has been placed and before it's intimated to supplier/carrier.
+- **Order Item ID:** Number of Items/Order.
+- **Price:** Price/Item, charged from a customer.
+- **Freight Value:** Dellivery Cost/Item, charged from a customer
+- **Product Weight (gms):** Weight of the product in grams
+
+**Please Note:** Price & Freight Value is amount charged per item and is not per order. Plus, an order may have more than one item.
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+Total.Gr <- inner_join(Seller.Gr, Customers, by ="customer_id")
+
+Tot.Gr <- na.omit(Total.Gr)
+Tot.Gr2 <- Tot.Gr %>% select_at(vars(order_id, Act.Lead.t, Approval.mins, order_item_id, price, freight_value ,product_weight_g))
+
+set.seed(32123)
+preproc <- preProcess(Tot.Gr2[2:7], method = c("range"))
+Tot.Grn <- predict(preproc, Tot.Gr2)
+
+Tot.Grkm <- kmeans(Tot.Gr2[2:7], centers = 6, iter.max = 1000)
+
+Tot.Grkm1 <- subset(Tot.Gr, Tot.Grkm$cluster == 1)
+Tot.Grkm2 <- subset(Tot.Gr, Tot.Grkm$cluster == 2)
+Tot.Grkm3 <- subset(Tot.Gr, Tot.Grkm$cluster == 3)
+Tot.Grkm4 <- subset(Tot.Gr, Tot.Grkm$cluster == 4)
+Tot.Grkm5 <- subset(Tot.Gr, Tot.Grkm$cluster == 5)
+Tot.Grkm6 <- subset(Tot.Gr, Tot.Grkm$cluster == 6)
+
+Tot.Grkm1 <- mutate(Tot.Grkm1, Clust = "Cluster1")
+Tot.Grkm2 <- mutate(Tot.Grkm2, Clust = "Cluster2")
+Tot.Grkm3 <- mutate(Tot.Grkm3, Clust = "Cluster3")
+Tot.Grkm4 <- mutate(Tot.Grkm4, Clust = "Cluster4")
+Tot.Grkm5 <- mutate(Tot.Grkm5, Clust = "Cluster5")
+Tot.Grkm6 <- mutate(Tot.Grkm6, Clust = "Cluster6")
+
+Tot.Gr3 <- union_all(Tot.Grkm1, Tot.Grkm2)
+Tot.Gr3 <- union_all(Tot.Gr3, Tot.Grkm3)
+Tot.Gr3 <- union_all(Tot.Gr3, Tot.Grkm4)
+Tot.Gr3 <- union_all(Tot.Gr3, Tot.Grkm5)
+Tot.Gr3 <- union_all(Tot.Gr3, Tot.Grkm6)
+
+w <- Tot.Gr3 %>% filter(order_status == "delivered")%>% select_at(vars(Clust, purchase_quart, Act.Lead.t, Approval.mins, order_item_id, price, freight_value ,product_weight_g)) %>% group_by(Clust, purchase_quart) %>% summarise_each(funs(median))
+colnames(w) <- c("Cluster","Quarter","Actual Lead Time (days)","Approval (mins)","Itmes per Order","Price","Freight Value","Weight (gms)")
+
+```
+
+### Cluster 1
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w1 <- w %>% filter(Cluster == "Cluster1")
+kable(w1, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 2, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+### Cluster 2
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w2 <- w %>% filter(Cluster == "Cluster2")
+kable(w2, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 1, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+### Cluster 3
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w3 <- w %>% filter(Cluster == "Cluster3")
+kable(w3, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 1, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+### Cluster 4
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w4 <- w %>% filter(Cluster == "Cluster4")
+kable(w4, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 1, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+### Cluster 5
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w5 <- w %>% filter(Cluster == "Cluster5")
+kable(w5, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 1, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+### Cluster 6
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
+w6 <- w %>% filter(Cluster == "Cluster6")
+kable(w6, digits = 2, caption = "Factors for k-means clustering & their values") %>% kable_styling(c("striped","bordered", "condensed"), full_width = F)%>% add_header_above(c(" "=2,"Factor 01" = 2, "Factor 02" = 3, "Factor 03" = 1)) %>% group_rows(index = c("Year 2016" = 1, "Year 2017" = 4, "Year 2018" = 3)) %>% footnote(general = "   ", alphabet = c("Orders delivered"),number = c("Only MEDIANs per quarter per factor are stated"), alphabet_title = "Order Status ::", number_title = "Values ::",footnote_as_chunk = T)
+```
+
+## Interpretability of relation {.tabset .tabset-fade .tabset-pills}
+
+In this section my attempt is to see the relationship between **Freight Value per Order** a customer pays and the **Number of Items per Order**. Now to interpret this relationship I am be using **Regression equations**, especially the ones that can help in inference and are much more interpretable. Hence, I have chosen **Quasi-Poisson Equations** - as here we are looking at the count data and **Polynomial Equations** - as a generic attempt *(sans due diligence on accuracy or model creation)*. 
+
+Let's start with the Graph first: this graph is a “Trade-off between Flexibility and Interpretability”. As my intention is interpretability, so my equations are low on flexibility (*or accuracy*) and relatively high on interpretability - as the status of **Grey POINT** on the graph shows.
+
+*[**Please Note**] I am not showing confidence intervals for model parameters and residual graph to determine if model is a good fit or not.*
+
+```{r, warning=FALSE, message=FALSE, fig.align='center', echo=FALSE}
+
+ggplot()+
+  theme_minimal()+
+  theme(axis.text = element_blank())+
+  geom_text(aes(x = 1, y = 6, label = "High"), inherit.aes = FALSE)+
+  geom_text(aes(x = 1, y = 1.5, label = "Low"), inherit.aes = FALSE)+
+  geom_text(aes(x = 6, y = 1.5, label = "High"), inherit.aes = FALSE)+
+  geom_text(aes(x = 0.85, y = 4, label = "Interpretability ~ less accuracy", angle = 90), inherit.aes = FALSE)+
+  geom_text(aes(x = 3.75, y = 1.25, label = "Flexibility ~ more accuracy"), inherit.aes = FALSE)+
+  geom_text(aes(y = 4.75, x = 2.45, label = "Regressions: Poisson & Polynomial"), inherit.aes = FALSE)+
+  geom_text(aes(x = 3.75, y = 4, label = "In this 'Trade-off' chart my equations stand: here"), inherit.aes = FALSE)+
+  geom_point(aes(x = 1.85, y = 4.5), size = 4, color = "grey9", alpha = 0.81, shape = 21, fill = alpha("gray63", 0.3), inherit.aes = FALSE)+
+  geom_segment(aes(x = 1, xend = 1, y = 2, yend = 5.5), lineend = "round", linetype= 2,inherit.aes = FALSE)+
+  geom_segment(aes(x = 1.5, xend = 5.5, y = 1.5, yend = 1.5), lineend = "round", linetype= 2,inherit.aes = FALSE)+
+  geom_segment(aes(x = 3.5, xend = 2, y = 4.25, yend = 4.45), lineend = "round", linetype= 1, arrow = arrow(length = unit(0.1,"inches")),inherit.aes = FALSE)+
+  labs(x = "", y = "", title = "Trade-off between Flexibility & Interpretability", 
+       subtitle = "Derived from: 'An Introduction to Statistical Learning', Chapter 2, Page - 25, Figure 2.7",
+       caption = "Authors: Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani")
+```
+
+**Complete Data**
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 7.772, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value} \approx 3.037 - 0.0357x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 12.387. The $\beta = -0.0357$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.0357.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- Number of Items per order
+- Price
+- Estimated lead time
+- Actaul lead time
+- Product's Weight (g)
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG3cd1 <- glm(freight_value ~ order_item_id, data = Tot.Gr3, family="poisson or quasipoisson")
+##summary(TG3cd1)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value} \approx 19.98 - 152.50x + 44.46x^2 - 79.47x^3 + 77.62x^4 + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE}
+##TG0cd1 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Gr3)
+##summary(TG0cd1)
+```
+
+<hr>
+
+### Cluster 1's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 3.207, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 1} \approx 2.830 - 0.037x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+  
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 3.984. The $\beta = -0.037$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.037.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- Number of Items per order
+- Price
+- Estimated lead time
+- Actaul lead time
+- Product's Weight (g)
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG31 <- glm(freight_value ~ order_item_id, data = Tot.Grkm1, family="poisson or quasipoisson")
+##summary(TG31)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 1} \approx 16.22 - 96.55x - 20.80x^3 + 29.69x^4 - 20.78x^5 + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG1 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Grkm1)
+##summary(TG1)
+```
+
+<hr>
+
+### Cluster 2's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 3.528, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 2} \approx 2.867 - 0.018x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 4.204. The $\beta = -0.018$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.018.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- Number of Items per order
+- Price
+- Estimated lead time
+- Actaul lead time
+- Product's Weight (g)
+- Product's Length (cm)
+- ~~Product's Height (cm)~~
+- ~~Product's Width (cm)~~
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG32 <- glm(freight_value ~ order_item_id, data = Tot.Grkm2, family="poisson or quasipoisson")
+##summary(TG32)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 2} \approx 17.14 - 34.91x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG2 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Grkm2)
+##summary(TG2)
+```
+
+<hr>
+
+### Cluster 3's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 35.237, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 3} \approx 4.525 - 0.032x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 38.974. The $\beta = -0.032$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.032.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- ~~Number of Items per order~~
+- Price
+- Estimated lead time
+- ~~Actaul lead time~~
+- ~~Product's Weight (g)~~
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG33 <- glm(freight_value ~ order_item_id, data = Tot.Grkm3, family="poisson or quasipoisson")
+##summary(TG33)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 3} \approx 89.06 + \epsilon $$
+
+$$ \epsilon \Rightarrow \text{error} $$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG3 <- lm(freight_value ~ poly(order_item_id, 5), data = Tot.Grkm3)
+##summary(TG3)
+```
+
+<hr>
+
+### Cluster 4's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 18.649, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 4} \approx 3.964 - 0.028x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 23.213. The $\beta = -0.028$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.028.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- ~~Number of Items per order~~
+- Price
+- Estimated lead time
+- ~~Actaul lead time~~
+- Product's Weight (g)
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG34 <- glm(freight_value ~ order_item_id, data = Tot.Grkm4, family="poisson or quasipoisson")
+##summary(TG34)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 4} \approx 50.88 + 98.48x^2 - 90.17x^3 + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG4 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Grkm4)
+##summary(TG4)
+```
+
+<hr>
+
+### Cluster 5's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 4.810, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 5} \approx 3.169 - 0.068x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 5.761. The $\beta = -0.068$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.068.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- Number of Items per order
+- Price
+- Estimated lead time
+- Actaul lead time
+- Product's Weight (g)
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG35 <- glm(freight_value ~ order_item_id, data = Tot.Grkm5, family="poisson or quasipoisson")
+##summary(TG35)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 5} \approx 22.00 - 95.53x + 27.75x^2 + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG5 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Grkm5)
+##summary(TG5)
+```
+
+<hr>
+
+### Cluster 6's Equations
+
+The $\frac{\text{Residual Deviance}}{\text{Degrees of freedom}} > 1 \text{ or} \text{ } \frac{\text{Variance}}{\text{Mean}} \neq 1$ for `Poisson Regression` is at 9.993, so probably there is overdispersion. We adjust to take into account overdispersion and use `Quasi-Poisson Regression` equation.
+
+`Quasi-Poisson: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 6} \approx 3.461 - 0.012x + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+**Interpretation:** The predictor is significant as p-value $\approx$ ZERO, the Dispersion parameter for `Quasi-Poisson` family is taken to be at 12.102. The $\beta = -0.012$ or $\beta < 0$ implies with **every unit increase** in items per order the freight **value will decrease** and will be multiplied by -0.012.
+
+IF we take 8 different parameters to determine the **Freight Value** then using `Quasi-Poisson regression` - following predictors are significant with p-value $\approx$ ZERO: 
+
+- Intercept
+- ~~Number of Items per order~~
+- Price
+- Estimated lead time
+- Actaul lead time
+- Product's Weight (g)
+- Product's Length (cm)
+- Product's Height (cm)
+- Product's Width (cm) 
+
+...and lastly the distance is yet to be taken into account.
+
+*NB: - ~~strikethrough~~ are non-significant parameters. Codes can be had from 'Codes' section.*
+
+```{r, warning=FALSE, message=FALSE}
+##TG36 <- glm(freight_value ~ order_item_id, data = Tot.Grkm6, family="poisson or quasipoisson")
+##summary(TG36)
+```
+
+<hr>
+
+`Polynomial: regression equation`
+
+$$\text{Freight Value}_\text{ Cluster 6} \approx 31.41 + 49.12x^2 + \epsilon $$
+
+$$ x \Rightarrow \text{Number of Items per Order}, \text{ } \epsilon \Rightarrow \text{error}$$
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+##TG6 <- lm(freight_value ~ poly(order_item_id, 6), data = Tot.Grkm6)
+##summary(TG6)
+```
+<hr>
+
+## Sellers vs Customers spread across states
+
+The graph below shows how the density of customers and sellers are spread across various states of Brazil. It is a stagnant presentation of graph "Customers.Sellers.States.gif", that is pasted below along with it's code.
+
+```{r, warning=FALSE, message=FALSE, fig.align='center', echo=FALSE, fig.height=8.25}
+CS.states <- inner_join(left_join(Customers,select(Orders, order_id, customer_id, order_status, Est.Lead.t, Act.Lead.t, Approval.mins, Appr.to.Car, Car.to.Cus), by = "customer_id"),left_join(Items, Sellers, by = "seller_id"), by = "order_id")
+
+CS.states <- mutate(CS.states, cs.ss= if_else(customer_zip_code_prefix == seller_zip_code_prefix,1,0))
+
+CSS.D <- CS.states %>% filter(order_status == "delivered")%>% ggplot(aes(y = customer_state, x = seller_state))+
+  geom_jitter(fill = alpha("blue", 0.001), color = "white", alpha = 0.36, size = 2.1, shape = 21)+
+  coord_polar(start = 0)+
+  theme_minimal()+
+  theme(axis.text.y = element_text(size = 5), axis.text.x = element_text(size = 7.5), axis.title = element_text(size = 9))+
+  labs(x = "Seller's State", y = "Customer's State", subtitle = "Group: Delivered orders")
+
+CSS.S <- CS.states %>% filter(order_status == "shipped")%>% ggplot(aes(y = customer_state, x = seller_state))+
+  geom_jitter(fill = alpha("red", 0.001), color = "white", alpha = 0.36, size = 2.1, shape = 21)+
+  coord_polar(start = 0)+
+  theme_minimal()+
+  theme(axis.text.y = element_text(size = 5), axis.text.x = element_text(size = 7.5), axis.title = element_text(size = 9))+
+  labs(x = "Seller's State", y = "Customer's State", subtitle = "Group: Shipped orders")
+
+CSS.P <- CS.states %>% filter(order_status == "processing")%>% ggplot(aes(y = customer_state, x = seller_state))+
+  geom_jitter(fill = alpha("olivedrab", 0.001), color = "white", alpha = 0.36, size = 2.1, shape = 21)+
+  coord_polar(start = 0)+
+  theme_minimal()+
+  theme(axis.text.y = element_text(size = 5), axis.text.x = element_text(size = 7.5), axis.title = element_text(size = 9))+
+  labs(x = "Seller's State", y = "Customer's State", subtitle = "Group: Orders in Processing")
+
+CSS.I <- CS.states %>% filter(order_status == "invoiced")%>% ggplot(aes(y = customer_state, x = seller_state))+
+  geom_jitter(fill = alpha("blueviolet", 0.001), color = "white", alpha = 0.36, size = 2.1, shape = 21)+
+  coord_polar(start = 0)+
+  theme_minimal()+
+  theme(axis.text.y = element_text(size = 5), axis.text.x = element_text(size = 7.5), axis.title = element_text(size = 9))+
+  labs(x = "Seller's State", y = "Customer's State", subtitle = "Group: Invoiced orders")
+
+grid.arrange(CSS.D, CSS.P, CSS.S, CSS.I, ncol = 2)
+
+```
+
+## Customer Order Cycle impression
+
+Graph is the first pictorial insight into: how Customer Order Cycle (*the time to deliver goods*) has changed as Olist started growing. This graph is the stagnant presentation of the graph "Lead.Times.gif", which has been pasted below along with it's code.
+
+```{r, warning=FALSE, fig.align='center', message=FALSE, echo=FALSE}
+Lead.Time <- Orders %>% group_by_at(vars(purchase_quart, order_status)) %>% summarise_at(c("Est.Lead.t","Act.Lead.t","Approval.mins", "Appr.to.Car", "Car.to.Cus"), mean, na.rm = TRUE) %>% arrange_at(vars(purchase_quart, order_status))
+Lead.Time <- mutate(Lead.Time, Quart.Y = paste0(purchase_quart, sep ="Q"))
+Lead.Time$Quart.Y <- as.factor(Lead.Time$Quart.Y)
+
+LT.D <- Lead.Time %>% filter(order_status =="delivered")%>% ggplot(aes(x = purchase_quart, y =Est.Lead.t))+
+  geom_point(size=4, color="red", fill=alpha("orange", 0.45), alpha=0.63, shape=21, stroke=1)+
+  facet_wrap(~Quart.Y, strip.position = "bottom")+
+  coord_polar(start = 0)+
+  theme(axis.text.x = element_blank(), axis.ticks = element_blank(), panel.background = element_blank(), panel.grid.major.x = element_line(color = "red", linetype = 4), panel.grid.major.y = element_line(color = "red", linetype = 3), strip.background = element_blank())+
+  labs(subtitle = "Order Status: Delivered", x = "", y = "")
+
+LT.S <- Lead.Time %>% filter(order_status =="shipped")%>% ggplot(aes(x = purchase_quart, y =Est.Lead.t))+
+  geom_point(size=4, color="navyblue", fill=alpha("blue", 0.45), alpha=0.63, shape=21, stroke=1)+
+  facet_wrap(~Quart.Y, strip.position = "bottom")+
+  coord_polar(start = 0)+
+  theme(axis.text = element_blank(), axis.ticks = element_blank(), panel.background = element_blank(), panel.grid.major.x = element_line(color = "royalblue", linetype = 4), panel.grid.major.y = element_line(color = "royalblue", linetype = 3), strip.background = element_blank())+
+  labs(subtitle = "Order Status: Shipped", x = "", y = "")
+
+grid.arrange(LT.D, LT.S, ncol = 2, top = "Change in average lead times per Quarter", left="Estimated average lead time [..in Days]", bottom = "Purchasing Quarter")
+
+```
+
+
+# Conclusion
+
+Thanks for giving your time to this long notebook. Should you like it, please do upvote.
+
+
+# Appendix
+
+<he>
+
+**Appendix 01**
+
+The code of "Customers.Sellers.States.gif" graph has been provided below. The animated graph had been created with **gganimate package** but due to API version incompatibility the actual code has been provided below for reference.
+
+![Olist's Customers - Sellers States' density](https://amoudgil.files.wordpress.com/2019/04/cs.gif?w=529)
+
+CS.states %>% 
+ggplot(aes(y = customer_state, x = seller_state))+
+  geom_jitter(fill = alpha("blue", 0.001), color = "white", alpha = 0.36, size = 2.1, shape = 21)+
+  coord_polar(start = 0)+
+  theme_minimal()+
+  labs(title ="Order Status' Density :: ...{closest_state}...", 
+  x = "Seller's State", y = "Customer's State", 
+  subtitle = "States :: Sellers vs. Customers")+
+transition_states(order_status, transition_length = 5, state_length = 5)
+
+<hr>
+
+**Appendix 02**
+
+The actual graph had been created with **gganimate package** but due to API version incompatibility the code of "Lead.Times.gif" graph has been provided below for reference.
+
+![Average Lead Times per Quarter per Year](https://amoudgil.files.wordpress.com/2019/04/lt.gif?w=529)
+
+Lead.Time %>% ggplot(aes(x = purchase_quart, y =Est.Lead.t))+
+  geom_line(color = "red", alpha = 0.81, linetype = "longdash")+
+  geom_segment(aes(xend = 2018.4, yend = Est.Lead.t), linetype = 2, colour = 'grey51')+
+  geom_text(aes(x = 2018.3, label = Quart.Y, hjust = 1))+
+  geom_point(size=3, color="red", fill=alpha("orange", 0.63), alpha=0.54, shape=21, stroke=1)+
+  facet_wrap(~order_status)+
+  coord_polar(start = 0)+
+  transition_reveal(purchase_quart)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_line(color = "coral", linetype = 3),
+        panel.grid.major.y = element_line(color = "coral", linetype = 3),
+        strip.background = element_blank())+
+  labs(title = "Change in proposed average lead times per Quarter/Year", 
+  subtitle = "Proposed average number of days to delivery", 
+  x = "Purchasing Quarter/Year", 
+  y= " Estimated average lead time [... in Days]", 
+  caption = "derived from Thomas Lin Pedersen's Dec 2018 graph: ~github.com/thomasp85")
+
+<hr>
+
+**Disclaimer:** The written article and the analysis was done in my individual capacity. The views and opinions expressed here are my own and they do not necessarily represent the views or opinions of any of the companies I worked (or working) for. Besides, I never worked for Olist either paid or otherwise.
+
+**Hashtags:** #ecommerce #SaaS #analytics #data #Brazil #supplychain #business  #marketplaces
